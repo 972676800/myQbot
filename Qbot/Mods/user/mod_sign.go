@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-type sign struct {
+type Sign struct {
 	Points int
 	LastDo time.Time
 	Signed bool
 }
 
-func (s *sign) isSigned() bool {
+func (s *Sign) isSigned() bool {
 	if s.isTimeOk() {
 		s.Signed = true
 	} else {
@@ -20,7 +20,7 @@ func (s *sign) isSigned() bool {
 	return s.Signed
 }
 
-func (s *sign) pointAdd() int {
+func (s *Sign) pointAdd() int {
 	s.LastDo = time.Now()
 	s.Signed = true
 	n := rand.Intn(3)
@@ -28,15 +28,15 @@ func (s *sign) pointAdd() int {
 	return n
 }
 
-func (s *sign) showPoints() int {
+func (s *Sign) showPoints() int {
 	return s.Points
 }
 
-func (s *sign) buy(point int) {
+func (s *Sign) buy(point int) {
 	s.Points -= point
 }
 
-func (s *sign) isTimeOk() bool {
+func (s *Sign) isTimeOk() bool {
 	//获得上次操作时间 转化为整点
 	LastDoTimeStamp := s.LastDo.Truncate(24 * time.Hour)
 	//获取现在时间 转化为整点

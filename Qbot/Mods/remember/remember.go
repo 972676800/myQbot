@@ -136,13 +136,5 @@ func init() {
 	if e != nil {
 		println(e.Error())
 	}
-	GetRememberFromDatabase()
-}
 
-func GetRememberFromDatabase() error {
-	err := db.DB.Table(R.TableName()).First(&R).Error
-	if err != nil {
-		return err
-	}
-	return nil
 }

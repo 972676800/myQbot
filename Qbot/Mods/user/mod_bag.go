@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type bag struct {
+type Bag struct {
 	Things []map[string]*value `gorm:"json"`
 }
 
@@ -17,7 +17,7 @@ type value struct {
 	LastDo time.Time
 }
 
-func (b *bag) showBags() string {
+func (b *Bag) showBags() string {
 	var result string
 	for index, value := range b.Things {
 		for k, v := range value {
@@ -27,7 +27,7 @@ func (b *bag) showBags() string {
 	return result
 }
 
-func (b *bag) buy(n string) {
+func (b *Bag) buy(n string) {
 	tmp := make(map[string]*value, 1)
 	tmp[n] = &value{
 		V:      1,
@@ -37,7 +37,7 @@ func (b *bag) buy(n string) {
 	b.Things = append(b.Things, tmp)
 }
 
-func (b *bag) NNN(ctx *zero.Ctx, index int, p *Player) {
+func (b *Bag) NNN(ctx *zero.Ctx, index int, p *Player) {
 	msgIndex := index + 1
 	for i, v := range b.Things {
 		if index == i {

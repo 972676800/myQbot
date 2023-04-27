@@ -3,7 +3,6 @@ package user
 import (
 	"Qbot_gocode/Mods/taro_card"
 	"Qbot_gocode/db"
-	"encoding/json"
 	"fmt"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -13,14 +12,14 @@ import (
 	"time"
 )
 
-var palyerList []Player
+var PalyerList []Player
 
 type Player struct {
 	gorm.Model
 	UserId   int `gorm:"uniqueIndex"`
 	NickName string
-	Bag      *bag  `gorm:"json"`
-	Point    *sign `gorm:"json"`
+	Bag      *Bag  `gorm:"json"`
+	Point    *Sign `gorm:"json"`
 }
 
 func (Player) TableName() string {
@@ -28,27 +27,27 @@ func (Player) TableName() string {
 }
 
 func newPlayer(userId int, nickName string) *Player {
-	var tmp *bag
-	tmp = new(bag)
+	var tmp *Bag
+	tmp = new(Bag)
 	return &Player{
 		UserId:   userId,
 		NickName: nickName,
 		Bag:      tmp,
-		Point:    new(sign),
+		Point:    new(Sign),
 	}
 }
 
 func FindPlayer(ctx *zero.Ctx) *Player {
 	userId := int(ctx.Event.Sender.ID)
 	userName := fmt.Sprintf("伟大的-%v-%v-%v", ctx.Event.Sender.Title, ctx.Event.Sender.Card, ctx.Event.Sender.NickName)
-	for _, v := range palyerList {
+	for _, v := range PalyerList {
 		if v.UserId == userId {
 			v.NickName = userName
 			return &v
 		}
 	}
 	p := newPlayer(userId, userName)
-	palyerList = append(palyerList, *p)
+	PalyerList = append(PalyerList, *p)
 	return p
 }
 
@@ -140,39 +139,7 @@ func init() {
 	if e != nil {
 		println(e.Error())
 	}
-	GetPlayersFromDatabase()
-}
-
-func GetPlayersFromDatabase() {
-	// 2. 查询数据库中的Player记录
-	var players []Player
-	if err := db.DB.Find(&players).Error; err != nil {
-		panic(err)
-	}
-	// 3. 转换查询结果为Player对象并添加到palyerList中
-	for _, p := range players {
-		b, err := json.Marshal(p.Bag)
-		if err != nil {
-			panic(err)
-		}
-		var tmp bag
-		err = json.Unmarshal(b, &tmp)
-		if err != nil {
-			panic(err)
-		}
-		p.Bag = &tmp
-		s, err := json.Marshal(p.Point)
-		if err != nil {
-			panic(err)
-		}
-		var signTmp sign
-		err = json.Unmarshal(s, &signTmp)
-		if err != nil {
-			panic(err)
-		}
-		p.Point = &signTmp
-		palyerList = append(palyerList, p)
-	}
+	db.GetPlayersFromDatabase()
 }
 
 func SavePlayers() {
@@ -181,7 +148,7 @@ func SavePlayers() {
 		println(err.Error())
 	}
 
-	for _, player := range palyerList {
+	for _, player := range PalyerList {
 		var existingPlayer Player
 		if err := db.DB.Where("user_id = ?", player.UserId).First(&existingPlayer).Error; err != nil {
 			// 如果查不到记录，则创建新的记录

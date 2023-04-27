@@ -9,9 +9,9 @@ import (
 	"math/rand"
 )
 
-var TaroCard taroCard
+var TaroCard Tc
 
-type taroCard map[int]Image
+type Tc map[int]Image
 
 type Image struct {
 	gorm.Model
@@ -37,7 +37,7 @@ func (Product) TableName() string {
 	return "t_taro_product"
 }
 
-func (t *taroCard) Select() (string, string) {
+func (t *Tc) Select() (string, string) {
 	for _, v := range *t {
 		var minging string
 		var position string
@@ -56,34 +56,9 @@ func (t *taroCard) Select() (string, string) {
 	return "", "发生错误，请联系主人"
 }
 
-func GetImagesFromDatabase() error {
-	var images []Image
-	if err := db.DB.Find(&images).Error; err != nil {
-		return err
-	}
-	TaroCard = make(taroCard, len(images))
-	for _, image := range images {
-		TaroCard[int(image.Id)] = image
-		//TaroCard[int(image.Id)].ProductMap[image.Product.Upright] = "正位"
-		//TaroCard[int(image.Id)].ProductMap[image.Product.Reversed] = "逆位"
-	}
-	fmt.Printf("%v", TaroCard)
-
-	return nil
-}
-
-func SaveTaroCard() error {
-	for _, image := range TaroCard {
-		if err := db.DB.Create(&image).Error; err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func init() {
 
-	GetImagesFromDatabase()
+	db.GetImagesFromDatabase()
 	fmt.Printf("%v", TaroCard)
 }
 
@@ -99,7 +74,7 @@ func GetTaroCardFromYml() {
 		panic(err)
 	}
 
-	TaroCard = make(taroCard, len(images))
+	TaroCard = make(Tc, len(images))
 	for k, image := range images {
 		image.ProductMap = make(map[string]string, 2)
 		TaroCard[k] = image
@@ -118,4 +93,13 @@ func GetTaroCardFromYml() {
 		println(e.Error())
 	}
 	SaveTaroCard()
+}
+
+func SaveTaroCard() error {
+	for _, image := range TaroCard {
+		if err := db.DB.Create(&image).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
