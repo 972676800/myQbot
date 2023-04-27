@@ -13,8 +13,9 @@ func init() {
 	engine := zero.New()
 	engine.OnFullMatch("bot reverse").Handle(
 		func(ctx *zero.Ctx) {
-			remember.R.SaveToDB()
+			//remember.R.SaveToDB()
 			user.SavePlayers()
+			remember.Save()
 			ctx.SendChain(message.Text("reverse success"))
 			//ctx.SendChain(message.Text("hello world!"))
 		})

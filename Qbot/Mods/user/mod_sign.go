@@ -23,7 +23,7 @@ func (s *Sign) isSigned() bool {
 func (s *Sign) pointAdd() int {
 	s.LastDo = time.Now()
 	s.Signed = true
-	n := rand.Intn(3)
+	n := rand.Intn(3) + 1
 	s.Points += n
 	return n
 }

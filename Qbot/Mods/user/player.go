@@ -176,17 +176,16 @@ func GetPlayersFromDatabase() {
 }
 
 func SavePlayers() {
-
 	for _, player := range PalyerList {
 		var existingPlayer Player
 		if err := db.DB.Where("user_id = ?", player.UserId).First(&existingPlayer).Error; err != nil {
 			// 如果查不到记录，则创建新的记录
-			if err := db.DB.Create(player).Error; err != nil {
+			if err := db.DB.Create(&player).Error; err != nil {
 				fmt.Printf("failed to create player record: %v\n", err)
 			}
 		} else {
 			// 如果查到了记录，则更新该记录
-			if err := db.DB.Save(player).Error; err != nil {
+			if err := db.DB.Save(&player).Error; err != nil {
 				fmt.Printf("failed to update player record: %v\n", err)
 			}
 		}

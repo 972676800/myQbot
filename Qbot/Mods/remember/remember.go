@@ -24,6 +24,17 @@ type Rememb struct {
 	Ops []string
 }
 
+type r struct {
+	Id   uint
+	Name string
+	Str  string
+	Ops  []string `gorm:"json"`
+}
+
+func (r) TableName() string {
+	return "t_remembers"
+}
+
 func (remember) TableName() string {
 	return "t_remember"
 }
@@ -39,6 +50,31 @@ func (r *remember) SaveToDB() error {
 		return (err)
 	}
 	return nil
+}
+
+func Save() {
+	var temp []r
+	for K, V := range R.M {
+		t := r{
+			Name: K,
+			Str:  V.Str,
+			Ops:  V.Ops,
+		}
+		temp = append(temp, t)
+	}
+	for _, v := range temp {
+		var t r
+		if err := db.DB.Where("name = ?", v.Name).First(&t).Error; err != nil {
+			if err := db.DB.Create(&v).Error; err != nil {
+				fmt.Printf("failed to create player record: %v\n", err)
+			}
+		} else {
+			// 如果查到了记录，则更新该记录
+			if err := db.DB.Save(&v).Error; err != nil {
+				fmt.Printf("failed to update player record: %v\n", err)
+			}
+		}
+	}
 }
 
 func FindRemember() *remember {
@@ -137,7 +173,29 @@ func init() {
 	if e != nil {
 		println(e.Error())
 	}
-	GetRememberFromDatabase()
+
+	e1 := db.DB.AutoMigrate(&r{})
+	if e1 != nil {
+		println(e1.Error())
+	}
+	//GetRememberFromDatabase()
+	f()
+}
+
+func f() {
+	var t []r
+	if err := db.DB.Find(&t).Error; err != nil {
+		panic(err)
+	}
+	R.M = make(map[string]*Rememb, len(t))
+	for _, v := range t {
+		R.Id = v.Id
+		R.M[v.Name] = &Rememb{
+			Str: v.Str,
+			Ops: v.Ops,
+		}
+	}
+	fmt.Printf("%v", R)
 }
 
 func GetRememberFromDatabase() error {
