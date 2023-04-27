@@ -3,6 +3,7 @@ package user
 import (
 	"Qbot_gocode/Mods/taro_card"
 	"Qbot_gocode/db"
+	"encoding/json"
 	"fmt"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -139,14 +140,42 @@ func init() {
 	if e != nil {
 		println(e.Error())
 	}
-	db.GetPlayersFromDatabase()
+
+}
+
+func GetPlayersFromDatabase() {
+	// 2. 查询数据库中的Player记录
+	var players []Player
+	if err := db.DB.Find(&players).Error; err != nil {
+		panic(err)
+	}
+	// 3. 转换查询结果为Player对象并添加到palyerList中
+	for _, p := range players {
+		b, err := json.Marshal(p.Bag)
+		if err != nil {
+			panic(err)
+		}
+		var tmp Bag
+		err = json.Unmarshal(b, &tmp)
+		if err != nil {
+			panic(err)
+		}
+		p.Bag = &tmp
+		s, err := json.Marshal(p.Point)
+		if err != nil {
+			panic(err)
+		}
+		var signTmp Sign
+		err = json.Unmarshal(s, &signTmp)
+		if err != nil {
+			panic(err)
+		}
+		p.Point = &signTmp
+		PalyerList = append(PalyerList, p)
+	}
 }
 
 func SavePlayers() {
-	err := db.DB.Exec("DELETE FROM t_player").Error
-	if err != nil {
-		println(err.Error())
-	}
 
 	for _, player := range PalyerList {
 		var existingPlayer Player
@@ -162,4 +191,8 @@ func SavePlayers() {
 			}
 		}
 	}
+}
+
+func init() {
+	GetPlayersFromDatabase()
 }

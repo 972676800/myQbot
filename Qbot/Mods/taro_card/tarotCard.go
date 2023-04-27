@@ -56,12 +56,6 @@ func (t *Tc) Select() (string, string) {
 	return "", "发生错误，请联系主人"
 }
 
-func init() {
-
-	db.GetImagesFromDatabase()
-	fmt.Printf("%v", TaroCard)
-}
-
 func GetTaroCardFromYml() {
 	yamlFile, err := ioutil.ReadFile("tlp.yml")
 	if err != nil {
@@ -102,4 +96,25 @@ func SaveTaroCard() error {
 		}
 	}
 	return nil
+}
+
+func GetImagesFromDatabase() error {
+	var images []Image
+	if err := db.DB.Find(&images).Error; err != nil {
+		return err
+	}
+	TaroCard = make(Tc, len(images))
+	for _, image := range images {
+		TaroCard[int(image.Id)] = image
+		//TaroCard[int(image.Id)].ProductMap[image.Product.Upright] = "正位"
+		//TaroCard[int(image.Id)].ProductMap[image.Product.Reversed] = "逆位"
+	}
+	fmt.Printf("%v", TaroCard)
+
+	return nil
+}
+
+func init() {
+	GetImagesFromDatabase()
+	fmt.Printf("%v", TaroCard)
 }

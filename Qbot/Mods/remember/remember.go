@@ -16,9 +16,10 @@ var R remember
 type remember struct {
 	gorm.Model
 	Id uint
-	M  map[string]*rememb `gorm:"json"`
+	M  map[string]*Rememb `gorm:"json"`
 }
-type rememb struct {
+
+type Rememb struct {
 	Str string
 	Ops []string
 }
@@ -42,7 +43,7 @@ func (r *remember) SaveToDB() error {
 
 func FindRemember() *remember {
 	if R.M == nil {
-		R.M = make(map[string]*rememb)
+		R.M = make(map[string]*Rememb)
 	}
 
 	return &R
@@ -53,7 +54,7 @@ func (r *remember) DefaultHandler(ctx *zero.Ctx) {
 		switch s[0] {
 		case "记住":
 			if s[2] != "" {
-				r.M[s[1]] = &rememb{Str: s[2], Ops: nil}
+				r.M[s[1]] = &Rememb{Str: s[2], Ops: nil}
 				ctx.SendChain(message.Text(fmt.Sprintf("【%v】记住了！", s[1])))
 			} else {
 				ctx.SendChain(message.Text(fmt.Sprintf("【%v】内容丢失，【记住】+【关键字】+【内容】中间要有空格哦亲~！", s[1])))
@@ -63,7 +64,7 @@ func (r *remember) DefaultHandler(ctx *zero.Ctx) {
 		case "添加":
 			if s[2] != "" {
 				if _, ok := r.M[s[1]]; !ok {
-					r.M[s[1]] = &rememb{Str: ""}
+					r.M[s[1]] = &Rememb{Str: ""}
 				}
 				r.M[s[1]].Ops = append(r.M[s[1]].Ops, s[2])
 				ctx.SendChain(message.Text(fmt.Sprintf("【%v】添加了！", s[1])))
@@ -112,14 +113,14 @@ func IsStrUrl(str string) (string, bool) {
 	}
 }
 
-func (r *remember) FindOneValue(str *rememb) string {
+func (r *remember) FindOneValue(str *Rememb) string {
 	if str.Ops != nil {
 		return str.Ops[rand.Intn(len(str.Ops))]
 	}
 	return str.Str
 }
 
-func (r *remember) FindAllValue(str *rememb) []string {
+func (r *remember) FindAllValue(str *Rememb) []string {
 	var result []string
 	if str.Ops != nil {
 		for _, op := range str.Ops {
@@ -136,5 +137,13 @@ func init() {
 	if e != nil {
 		println(e.Error())
 	}
+	GetRememberFromDatabase()
+}
 
+func GetRememberFromDatabase() error {
+	err := db.DB.Table(R.TableName()).First(&R).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

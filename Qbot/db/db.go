@@ -14,5 +14,4 @@ func init() {
 		panic(err)
 	}
 
-	GetRememberFromDatabase()
 }

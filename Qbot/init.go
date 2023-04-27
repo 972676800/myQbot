@@ -2,9 +2,9 @@ package main
 
 import (
 	"Qbot_gocode/Mods/fd"
+	"Qbot_gocode/Mods/remember"
 	"Qbot_gocode/Mods/reverse"
 	"Qbot_gocode/Mods/user"
-	"Qbot_gocode/mods/remember"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 )
