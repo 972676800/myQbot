@@ -1,4 +1,4 @@
-package weather
+package API
 
 import (
 	"encoding/json"

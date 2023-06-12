@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var PalyerList []Player
@@ -77,7 +76,6 @@ func (p *Player) DefaultHandler(ctx *zero.Ctx) {
 				if cmd == "抽塔罗牌" {
 					url, str := taro_card.TaroCard.Select()
 					ctx.SendChain(message.Image(url))
-					time.Sleep(time.Second * 1)
 					ctx.SendChain(message.Text(fmt.Sprintf("【%s】\n%s", p.NickName, str)))
 				}
 				if cmd == "使用指南" {
@@ -119,6 +117,12 @@ func (p *Player) Sign(ctx *zero.Ctx) {
 }
 
 func (p *Player) Buy(ctx *zero.Ctx, msg message.MessageSegment) {
+	defer func() {
+		e := recover()
+		if e != nil {
+			println(e)
+		}
+	}()
 	if price, ok := Things[strings.Split(msg.Data["text"], " ")[1]]; ok {
 		name := strings.Split(msg.Data["text"], " ")[1]
 		if !Things.IsApplied(name, p.Point.Points) {

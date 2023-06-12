@@ -35,8 +35,8 @@ func (r *reverse) ReverseHandler(ctx *zero.Ctx) {
 }
 
 func LeftPush(s string) {
-	Reverse.msgRemember = Reverse.msgRemember[1:]
-	Reverse.msgRemember = append(Reverse.msgRemember, s)
+	Reverse.msgRemember[0] = Reverse.msgRemember[1]
+	Reverse.msgRemember[1] = s
 }
 
 func NewReverse() *reverse {

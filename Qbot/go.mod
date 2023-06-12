@@ -3,6 +3,7 @@ module Qbot_gocode
 go 1.18
 
 require (
+	github.com/sashabaranov/go-openai v1.10.0
 	github.com/wdvxdr1123/ZeroBot v1.6.11
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.5.0
